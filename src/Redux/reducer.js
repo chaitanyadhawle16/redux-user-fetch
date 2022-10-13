@@ -20,7 +20,6 @@ function itemReducer(state = initState, action){
               ...state, page : action.payload
           }
         case "SET_LOADING" :
-            //   console.log("set loading  " + action.payload); 
           return {
               ...state,  loading : action.payload
           }

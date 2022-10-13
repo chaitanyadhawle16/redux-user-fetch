@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
 import CardComponent from './CardComponent';
 import { fetchData } from '../Redux/fetchData'; 
 import { useDispatch, connect } from 'react-redux';
@@ -6,42 +6,29 @@ import { setPage, setLoading } from '../Redux/actions'
 
 const List = ({items, loading, page}) => {
   const dispatch = useDispatch();
-  const [lastElement, setLastElement] = useState(null);
 
+  const observer = useRef();
+  const setLastElement = useCallback(node => {
 
-  const observer = useRef(
-    new IntersectionObserver(
-      (items) => {
-        const first = items[0];
-        if (first.isIntersecting) {
-          dispatch(setPage(page + 1));
-        }
-      })
-  );
+    if(observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      if(entries[0].isIntersecting){
+          dispatch(setPage(page+1));
+      }
+    })
+    if(node) observer.current.observe(node)
+  },[page,dispatch]);
 
   useEffect(() => {
-    dispatch(setLoading(true))
-    if (page <= 2)
+    if (page <= 6){
+      dispatch(setLoading(true))
       setTimeout(() => {
         dispatch(fetchData(page));
       }, 1000);
-  }, [page,dispatch])
-
-  useEffect(() => {
-    const currentElement = lastElement;
-    const currentObserver = observer.current;
-
-    if (currentElement) {
-      currentObserver.observe(currentElement);
     }
-
-    return () => {
-      if (currentElement) {
-        currentObserver.unobserve(currentElement);
-      }
-    };
-  }, [lastElement]);
-
+  }, [page,dispatch])
+  
   return (
 
     <div id="container" className='container'>

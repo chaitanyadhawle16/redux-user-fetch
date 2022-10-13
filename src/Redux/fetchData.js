@@ -8,7 +8,7 @@ export const fetchData = (page=1) =>{
         .then(response => response.json())
         .then(data => dispatch(fetchItemsSuccess(data)))
         .catch(err => dispatch(fetchItemsFail(err)));
-
         dispatch(setLoading(false));
+        
     };
  }
